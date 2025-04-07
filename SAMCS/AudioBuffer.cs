@@ -37,7 +37,8 @@ namespace SAMCS
 
         public void Append(byte b)
         {
-            mBuffer ??= new byte[BUFFER_SIZE];
+            if (mBuffer == null)
+                mBuffer = new byte[BUFFER_SIZE];
 
             if (mBuffer.Length <= mSize + 1)
             {
@@ -52,7 +53,8 @@ namespace SAMCS
 
         public void Append(byte[] buffer)
         {
-            mBuffer ??= new byte[BUFFER_SIZE];
+            if (mBuffer == null)
+                mBuffer = new byte[BUFFER_SIZE];
 
             if (mBuffer.Length <= mSize + buffer.Length)
             {
@@ -69,7 +71,8 @@ namespace SAMCS
 
         public void Write(int cursor, byte b)
         {
-            mBuffer ??= new byte[BUFFER_SIZE];
+            if (mBuffer == null)
+                mBuffer = new byte[BUFFER_SIZE];
 
             if (cursor >= mBuffer.Length && mBuffer.Length <= cursor + 1)
             {

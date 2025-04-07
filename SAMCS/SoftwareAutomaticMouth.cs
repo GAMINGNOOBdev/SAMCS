@@ -56,8 +56,8 @@ namespace SAMCS
             mSpeechRenderer = new SpeechRenderer();
             SpeechRenderer.SetMouthThroat(mouth, throat);
 
-            Array.Clear(mStress);
-            Array.Clear(mPhonemeLength);
+            Array.Clear(mStress, 0, mStress.Length);
+            Array.Clear(mPhonemeLength, 0, mPhonemeLength.Length);
             Array.Clear(mStressOutput, 0, 60);
             Array.Clear(mPhonemeIndexOutput, 0, 60);
             Array.Clear(mPhonemeLengthOutput, 0, 60);
@@ -69,7 +69,7 @@ namespace SAMCS
         public bool Speak(string text, bool phonetic)
         {
             byte[] input = new byte[256];
-            Array.Clear(input);
+            Array.Clear(input, 0, input.Length);
             byte[] tmp = Encoding.ASCII.GetBytes(text);
             Array.Copy(tmp, input, tmp.Length);
             int offset = tmp.Length;

@@ -5,13 +5,13 @@ namespace SAMCS
     {
         //timetable for more accurate c64 simulation
         private static readonly int[][] gTimetable =
-        [
-            [162, 167, 167, 127, 128],
-            [226, 60, 60, 0, 0],
-            [225, 60, 59, 0, 0],
-            [200, 0, 0, 54, 55],
-            [199, 0, 0, 54, 54]
-        ];
+        {
+            new int[]{162, 167, 167, 127, 128},
+            new int[]{226, 60, 60, 0, 0},
+            new int[]{225, 60, 59, 0, 0},
+            new int[]{200, 0, 0, 54, 55},
+            new int[]{199, 0, 0, 54, 54}
+        };
 
 
         private readonly byte[] mSampledConsonantFlag = new byte[256]; // tab44800
@@ -35,25 +35,25 @@ namespace SAMCS
             byte newFrequency = 0;
 
             // mouth formants (F1) 5..29
-            byte[] mouthFormants5_29 = [
+            byte[] mouthFormants5_29 = {
                 0, 0, 0, 0, 0, 10,
                 14, 19, 24, 27, 23, 21, 16, 20, 14, 18, 14, 18, 18,
                 16, 13, 15, 11, 18, 14, 11, 9, 6, 6, 6
-            ];
+            };
 
             // throat formants (F2) 5..29
-            byte[] throatFormants5_29 = [
+            byte[] throatFormants5_29 = {
                 255, 255,
                 255, 255, 255, 84, 73, 67, 63, 40, 44, 31, 37, 45, 73, 49,
                 36, 30, 51, 37, 29, 69, 24, 50, 30, 24, 83, 46, 54, 86
-            ];
+            };
 
             // there must be no zeros in this 2 tables
             // formant 1 frequencies (mouth) 48..53
-            byte[] mouthFormants48_53 = [19, 27, 21, 27, 18, 13];
+            byte[] mouthFormants48_53 = {19, 27, 21, 27, 18, 13};
 
             // formant 2 frequencies (throat) 48..53
-            byte[] throatFormants48_53 = [72, 39, 31, 43, 30, 34];
+            byte[] throatFormants48_53 = {72, 39, 31, 43, 30, 34};
 
             byte pos = 5;
         //pos38942:
@@ -647,7 +647,7 @@ namespace SAMCS
 
         private void Output8Bit(ref AudioBuffer a, int index, byte A)
         {
-            Output8BitAry(ref a, index, [A,A,A,A,A]);
+            Output8BitAry(ref a, index, new byte[]{A,A,A,A,A});
         }
 
         private byte Read(byte ptr, byte index)

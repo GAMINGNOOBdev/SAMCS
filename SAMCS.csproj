@@ -3,8 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>SAMCS</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>GAMINGNOOBdev</Authors>
     <Description>Cross platform Microsoft SAM library</Description>
     <RepositoryUrl>https://github.com/GAMINGNOOBdev/SAMCS</RepositoryUrl>
