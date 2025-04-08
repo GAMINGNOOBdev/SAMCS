@@ -7,8 +7,9 @@ namespace SAMCS
 
     public class SoftwareAutomaticMouth
     {
-        private readonly SoftwareAutomaticMouthTables mSoftwareAutomaticMouthTables = new SoftwareAutomaticMouthTables();
+        private static readonly int MAX_LENGTH = 254;
 
+        private readonly SoftwareAutomaticMouthTables mSoftwareAutomaticMouthTables = new SoftwareAutomaticMouthTables();
         private byte[] mPhonemeLengthOutput = new byte[60];
         private byte[] mPhonemeIndexOutput = new byte[60];
         private byte[] mPhonemeLength = new byte[256];
@@ -89,8 +90,31 @@ namespace SAMCS
         /// <returns>A non-null audio buffer object if no errors occurred, otherwise null</returns>
         public AudioBuffer Speak(string text, bool phonetic = false)
         {
-
             AudioBuffer buffer = new AudioBuffer();
+
+            if (text.Length > MAX_LENGTH)
+            {
+                int length = text.Length;
+                for (int i = 0; i < length;)
+                {
+                    int size = MAX_LENGTH;
+                    if (length-i <= MAX_LENGTH)
+                        size = length-i;
+
+                    string subtext = text.Substring(i, size);
+                    if (subtext.LastIndexOf(' ') != subtext.IndexOf(' '))
+                        size = subtext.LastIndexOf(' ');
+                    subtext = text.Substring(i, size);
+                    AudioBuffer tmpBuffer = Speak(subtext, phonetic);
+                    if (tmpBuffer != null)
+                        buffer.Append(tmpBuffer.Buffer);
+
+                    i += size;
+                }
+
+                return buffer;
+            }
+
             byte[] input = new byte[256];
             Array.Clear(input, 0, input.Length);
             byte[] tmp = Encoding.ASCII.GetBytes(text);
@@ -109,7 +133,7 @@ namespace SAMCS
 
             if (!Parser1(input))
                 return null;
-            
+
             Parser2();
             CopyStress();
             SetPhonemeLength();
@@ -368,13 +392,13 @@ namespace SAMCS
 
 
                 // Check for DIPHTONG
-                if ((mSoftwareAutomaticMouthTables.flags[phIndex] & 16) == 0) goto pos41457;
+                if ((mSoftwareAutomaticMouthTables.GetFlag(phIndex) & 16) == 0) goto pos41457;
 
                 // Not a diphthong. Get the stress
                 stress = mStress[pos];
 
                 // End in IY sound?
-                phIndex = (byte)(mSoftwareAutomaticMouthTables.flags[tmpIndex] & 32);
+                phIndex = (byte)(mSoftwareAutomaticMouthTables.GetFlag(tmpIndex) & 32);
 
                 // If ends with IY, use YX, else use WX
                 if (phIndex == 0) phIndex = 20; else phIndex = 21;    // 'WX' = 20 'YX' = 21
@@ -441,7 +465,7 @@ namespace SAMCS
 
                 tmpIndex = phIndex;
                 // VOWEL set?
-                phIndex = (byte)(mSoftwareAutomaticMouthTables.flags[phIndex] & 128);
+                phIndex = (byte)(mSoftwareAutomaticMouthTables.GetFlag(phIndex) & 128);
 
                 // Skip if not a vowel
                 if (phIndex != 0)
@@ -469,7 +493,7 @@ namespace SAMCS
                                 phIndex = 65&128;
                             else
                                 // And VOWEL flag to current phoneme's SamTabs.flags
-                                phIndex = (byte)(mSoftwareAutomaticMouthTables.flags[tmpIndex] & 128);
+                                phIndex = (byte)(mSoftwareAutomaticMouthTables.GetFlag(tmpIndex) & 128);
 
                             // If following phonemes is not a pause
                             if (phIndex != 0)
@@ -530,7 +554,7 @@ namespace SAMCS
 
 
                 // If vowel flag is set change R to RX
-                phIndex = (byte)(mSoftwareAutomaticMouthTables.flags[phIndex] & 128);
+                phIndex = (byte)(mSoftwareAutomaticMouthTables.GetFlag(phIndex) & 128);
                 if (phIndex != 0) mPhonemeIndex[pos] = 18;  // 'RX'
 
                 // continue to next phoneme
@@ -547,7 +571,7 @@ namespace SAMCS
                 if (phIndex == 24)    // 'L'
                 {
                     // If prior phoneme does not have VOWEL flag set, move to next phoneme
-                    if ((mSoftwareAutomaticMouthTables.flags[mPhonemeIndex[pos-1]] & 128) == 0) {pos++; continue;}
+                    if ((mSoftwareAutomaticMouthTables.GetFlag(mPhonemeIndex[pos-1]) & 128) == 0) {pos++; continue;}
                     // Prior phoneme has VOWEL flag set, so change L to LX and move to next phoneme
                     mPhonemeIndex[currentPos] = 19;     // 'LX'
                     pos++;
@@ -586,7 +610,7 @@ namespace SAMCS
                     else
                     {
                         // VOWELS AND DIPHTONGS ENDING WITH IY SOUND flag set?
-                        phIndex = (byte)(mSoftwareAutomaticMouthTables.flags[tmpIndex] & 32);
+                        phIndex = (byte)(mSoftwareAutomaticMouthTables.GetFlag(tmpIndex) & 32);
                         // Replace with KX
                         if (phIndex == 0) mPhonemeIndex[pos] = 75;  // 'KX'
                     }
@@ -611,7 +635,7 @@ namespace SAMCS
                     }
                     else
                     // If diphtong ending with YX, move continue processing next phoneme
-                    if ((mSoftwareAutomaticMouthTables.flags[index] & 32) != 0) {pos++; continue;}
+                    if ((mSoftwareAutomaticMouthTables.GetFlag(index) & 32) != 0) {pos++; continue;}
                     // replace G with GX and continue processing next phoneme
                     mPhonemeIndex[pos] = 63; // 'GX'
                     pos++;
@@ -628,7 +652,7 @@ namespace SAMCS
                 tmpIndex = mPhonemeIndex[pos];
                 //pos41719:
                 // Replace with softer version?
-                phIndex = (byte)(mSoftwareAutomaticMouthTables.flags[tmpIndex] & 1);
+                phIndex = (byte)(mSoftwareAutomaticMouthTables.GetFlag(tmpIndex) & 1);
                 if (phIndex == 0) goto pos41749;
                 phIndex = mPhonemeIndex[pos-1];
                 if (phIndex != 32)    // 'S'
@@ -709,7 +733,7 @@ namespace SAMCS
 
 
                 // If prior phoneme is not a vowel, continue processing phonemes
-                if ((mSoftwareAutomaticMouthTables.flags[mPhonemeIndex[currentPos-1]] & 128) == 0) {pos++; continue;}
+                if ((mSoftwareAutomaticMouthTables.GetFlag(mPhonemeIndex[currentPos-1]) & 128) == 0) {pos++; continue;}
 
                 // Get next phoneme
                 currentPos++;
@@ -719,7 +743,7 @@ namespace SAMCS
                 if (phIndex != 0)
                 {
                     // If next phoneme is not a pause, continue processing phonemes
-                    if ((mSoftwareAutomaticMouthTables.flags[phIndex] & 128) == 0) {pos++; continue;}
+                    if ((mSoftwareAutomaticMouthTables.GetFlag(phIndex) & 128) == 0) {pos++; continue;}
                     // If next phoneme is stressed, continue processing phonemes
                     // FIXME: How does a pause get stressed?
                     if (mStress[currentPos] != 0) {pos++; continue;}
@@ -733,7 +757,7 @@ namespace SAMCS
                         phIndex = 65 & 128;
                     else
                         // Is next phoneme a vowel or ER?
-                        phIndex = (byte)(mSoftwareAutomaticMouthTables.flags[phIndex] & 128);
+                        phIndex = (byte)(mSoftwareAutomaticMouthTables.GetFlag(phIndex) & 128);
                     if (phIndex != 0) mPhonemeIndex[pos] = 30;  // 'DX'
                 }
 
@@ -755,7 +779,7 @@ namespace SAMCS
                 if (ph == 255) return;
 
                 // if CONSONANT_FLAG set, skip - only vowels get stress
-                if ((mSoftwareAutomaticMouthTables.flags[ph] & 64) == 0) {pos++; continue;}
+                if ((mSoftwareAutomaticMouthTables.GetFlag(ph) & 64) == 0) {pos++; continue;}
                 // get the next phoneme
                 ph = mPhonemeIndex[pos+1];
                 if (ph == 255) //prevent buffer overflow
@@ -763,7 +787,7 @@ namespace SAMCS
                     pos++; continue;
                 } else
                 // if the following phoneme is a vowel, skip
-                if ((mSoftwareAutomaticMouthTables.flags[ph] & 128) == 0)  {pos++; continue;}
+                if ((mSoftwareAutomaticMouthTables.GetFlag(ph) & 128) == 0)  {pos++; continue;}
 
                 // get the stress value at the next position
                 ph = mStress[pos+1];
@@ -862,7 +886,7 @@ namespace SAMCS
                 index = mPhonemeIndex[currentIndex];
 
                 if (index != 255) //inserted to prevent access overrun
-                if((mSoftwareAutomaticMouthTables.flags[index] & 128) == 0) goto pos48644; // if not a vowel, continue looping
+                if((mSoftwareAutomaticMouthTables.GetFlag(index) & 128) == 0) goto pos48644; // if not a vowel, continue looping
 
                 //pos48657:
                 do
@@ -872,7 +896,7 @@ namespace SAMCS
 
                     if (index != 255)//inserted to prevent access overrun
                     // test for fricative/unvoiced or not voiced
-                    if(((mSoftwareAutomaticMouthTables.flags2[index] & 32) == 0) || ((mSoftwareAutomaticMouthTables.flags[index] & 4) != 0))     //nochmal �berpr�fen
+                    if(((mSoftwareAutomaticMouthTables.flags2[index] & 32) == 0) || ((mSoftwareAutomaticMouthTables.GetFlag(index) & 4) != 0))     //nochmal �berpr�fen
                     {
                         //A = SamTabs.flags[Y] & 4;
                         //if(A == 0) goto pos48688;
@@ -908,7 +932,7 @@ namespace SAMCS
                 if (index == 255) return;
 
                 // vowel?
-                tmpLengthAndFlags = (byte)(mSoftwareAutomaticMouthTables.flags[index] & 128);
+                tmpLengthAndFlags = (byte)(mSoftwareAutomaticMouthTables.GetFlag(index) & 128);
                 if (tmpLengthAndFlags != 0)
                 {
                     // get next phoneme
@@ -919,10 +943,10 @@ namespace SAMCS
                     if (index == 255)
                         length = 65; // use if end marker
                     else
-                        length = mSoftwareAutomaticMouthTables.flags[index];
+                        length = mSoftwareAutomaticMouthTables.GetFlag(index);
 
                     // not a consonant
-                    if ((mSoftwareAutomaticMouthTables.flags[index] & 64) == 0)
+                    if ((length & 64) == 0)
                     {
                         // RX or LX?
                         if ((index == 18) || (index == 19))  // 'RX' & 'LX'
@@ -932,7 +956,7 @@ namespace SAMCS
                             index = mPhonemeIndex[currentIndex];
 
                             // next phoneme a consonant?
-                            if ((mSoftwareAutomaticMouthTables.flags[index] & 64) != 0) {
+                            if ((mSoftwareAutomaticMouthTables.GetFlag(index) & 64) != 0) {
                                 // RULE: <VOWEL> RX | LX <CONSONANT>
 
 
@@ -1027,7 +1051,7 @@ namespace SAMCS
                     if (index == 255)
                     tmpLengthAndFlags = 65&2;  //prevent buffer overflow
                     else
-                        tmpLengthAndFlags = (byte)(mSoftwareAutomaticMouthTables.flags[index] & 2); // check for stop consonant
+                        tmpLengthAndFlags = (byte)(mSoftwareAutomaticMouthTables.GetFlag(index) & 2); // check for stop consonant
 
 
                     // is next phoneme a stop consonant?
@@ -1057,7 +1081,7 @@ namespace SAMCS
                 //       Shorten both to (length/2 + 1)
 
                 // (voiced) stop consonant?
-                if((mSoftwareAutomaticMouthTables.flags[index] & 2) != 0)
+                if((mSoftwareAutomaticMouthTables.GetFlag(index) & 2) != 0)
                 {
                     // B*, D*, G*, GX
 
@@ -1075,7 +1099,7 @@ namespace SAMCS
                     {
                         // ignore, overflow code
                         if ((65 & 2) == 0) {loopIndex++; continue;}
-                    } else if ((mSoftwareAutomaticMouthTables.flags[index] & 2) == 0) {
+                    } else if ((mSoftwareAutomaticMouthTables.GetFlag(index) & 2) == 0) {
                         // if another stop consonant, move ahead
                         loopIndex++;
                         continue;
@@ -1108,7 +1132,7 @@ namespace SAMCS
                     index = mPhonemeIndex[currentIndex-1];
 
                     // prior phoneme a stop consonant>
-                    if((mSoftwareAutomaticMouthTables.flags[index] & 2) != 0) {
+                    if((mSoftwareAutomaticMouthTables.GetFlag(index) & 2) != 0) {
                                     // Rule: <LIQUID CONSONANT> <DIPHTONG>
 
 
@@ -1135,12 +1159,12 @@ namespace SAMCS
                 byte index; //register AC
                 resultPos = pos;
                 index = mPhonemeIndex[pos];
-                if ((mSoftwareAutomaticMouthTables.flags[index]&2) == 0)
+                if ((mSoftwareAutomaticMouthTables.GetFlag(index) & 2) == 0)
                 {
                     pos++;
                     continue;
                 } else
-                if ((mSoftwareAutomaticMouthTables.flags[index]&1) == 0)
+                if ((mSoftwareAutomaticMouthTables.GetFlag(index) & 1) == 0)
                 {
                     Insert((byte)(pos+1), (byte)(index+1), mSoftwareAutomaticMouthTables.phonemeLengthTable[index+1], mStress[pos]);
                     Insert((byte)(pos+2), (byte)(index+2), mSoftwareAutomaticMouthTables.phonemeLengthTable[index+2], mStress[pos]);
@@ -1157,7 +1181,7 @@ namespace SAMCS
 
                 if (phIndex != 255)
                 {
-                    if ((mSoftwareAutomaticMouthTables.flags[phIndex] & 8) != 0)  {pos++; continue;}
+                    if ((mSoftwareAutomaticMouthTables.GetFlag(phIndex) & 8) != 0)  {pos++; continue;}
                     if ((phIndex == 36) || (phIndex == 37)) {pos++; continue;} // '/H' '/X'
                 }
 

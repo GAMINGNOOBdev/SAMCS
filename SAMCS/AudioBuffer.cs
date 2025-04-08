@@ -65,6 +65,9 @@ namespace SAMCS
         /// <param name="buffer">Audio data</param>
         public void Append(byte[] buffer)
         {
+            if (buffer == null)
+                return;
+
             if (mBuffer == null)
                 mBuffer = new byte[BUFFER_SIZE];
 

@@ -7,6 +7,14 @@ namespace SAMCS
     /// </summary>
     public class SpeechRendererTables
     {
+        public byte GetTab47492(int index)
+        {
+            if (index >= tab47492.Length)
+                index = tab47492.Length - 1;
+
+            return tab47492[index];
+        }
+
 
         public readonly byte[] tab48426 = { 0x18, 0x1A, 0x17, 0x17, 0x17 };
 

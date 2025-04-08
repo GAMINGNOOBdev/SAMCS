@@ -169,7 +169,8 @@ namespace SAMCS
                 //  pos47615:
 
                 // get the stress amount (more stress = higher pitch)
-                phase1 = mSpeechRendererTables.tab47492[b.StressOutput[inIndex] + 1];
+                int stressIdx = b.StressOutput[inIndex] + 1;
+                phase1 = mSpeechRendererTables.GetTab47492(stressIdx);
 
                 // get number of frames to write
                 phase2 = b.PhonemeLengthOutput[inIndex];
