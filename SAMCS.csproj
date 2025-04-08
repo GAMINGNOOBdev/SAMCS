@@ -8,6 +8,11 @@
     <Description>Cross platform Microsoft SAM library</Description>
     <RepositoryUrl>https://github.com/GAMINGNOOBdev/SAMCS</RepositoryUrl>
     <PackageTags>SoftwareAutomaticMouth, SAM, Audio, C#, CSharp</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="LICENSE" Pack="true" PackagePath=""/>
+  </ItemGroup>
 
 </Project>
