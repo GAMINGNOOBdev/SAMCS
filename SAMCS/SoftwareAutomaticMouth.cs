@@ -55,6 +55,14 @@ namespace SAMCS
             set => mSpeechRenderer.Throat = value;
         }
 
+        /// <summary>
+        /// Constructor for SAM
+        /// </summary>
+        /// <param name="pitch">Voice pitch of SAM</param>
+        /// <param name="speed">Talking speed of SAM</param>
+        /// <param name="mouth">Mouth size of SAM</param>
+        /// <param name="throat">Throat size of SAM</param>
+        /// <param name="sing">Should SAM sing?</param>
         public SoftwareAutomaticMouth(byte pitch = 64, byte speed = 72, byte mouth = 128, byte throat = 128, bool sing = false)
         {
             mPitch = pitch;
@@ -73,7 +81,12 @@ namespace SAMCS
             mPhonemeIndex[255] = 32; // prevents buffer overflow apparently
         }
 
-        // returns: true = success, false = error
+        /// <summary>
+        /// Speaks the given text and returns an audio buffer.
+        /// </summary>
+        /// <param name="text">Input text that will be spoken</param>
+        /// <param name="phonetic">Whether the phonemes should be generated or not</param>
+        /// <returns>A non-null audio buffer object if no errors occurred, otherwise null</returns>
         public AudioBuffer Speak(string text, bool phonetic = false)
         {
 
@@ -119,6 +132,15 @@ namespace SAMCS
 
             return buffer;
         }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        ///                                                                                     ///
+        ///                                                                                     ///
+        ///                        !!!NOT NEEDED FOR THE END USER!!!                            ///
+        ///   Intended for internal use only, no need to look at this or even understand this   ///
+        ///                                                                                     ///
+        ///                                                                                     ///
+        ///////////////////////////////////////////////////////////////////////////////////////////
 
         // The input[] buffer contains a string of phonemes and stress markers along
         // the lines of:

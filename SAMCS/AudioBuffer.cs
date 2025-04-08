@@ -39,6 +39,10 @@ namespace SAMCS
             mSize = 0;
         }
 
+        /// <summary>
+        /// Append a byte of audio data to the end of the buffer
+        /// </summary>
+        /// <param name="b">The single byte audio data</param>
         public void Append(byte b)
         {
             if (mBuffer == null)
@@ -55,6 +59,10 @@ namespace SAMCS
             mSize++;
         }
 
+        /// <summary>
+        /// Append a buffer to the end of this audio buffer
+        /// </summary>
+        /// <param name="buffer">Audio data</param>
         public void Append(byte[] buffer)
         {
             if (mBuffer == null)
@@ -73,7 +81,12 @@ namespace SAMCS
             mSize += buffer.Length;
         }
 
-        public void Write(int cursor, byte b)
+        /// <summary>
+        /// Append a single byte of data into the buffer at a specific position 
+        /// </summary>
+        /// <param name="cursor">Where in the buffer we should append</param>
+        /// <param name="b">The single byte of audio data</param>
+        public void AppendAt(int cursor, byte b)
         {
             if (mBuffer == null)
                 mBuffer = new byte[BUFFER_SIZE];

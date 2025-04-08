@@ -1,5 +1,10 @@
 namespace SAMCS
 {
+
+    /// <summary>
+    /// !!!NOT NEEDED FOR THE END USER!!!
+    /// Intended for internal use only, no need to look at this or even understand this
+    /// </summary>
     public class ReciterTabs
     {
 

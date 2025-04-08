@@ -5,12 +5,11 @@ A port of https://github.com/s-macke/SAM for netstandard2.0 C#
 > Just so you know the code is messy from origin. I tried to remove/simplify some stuff but it is what it is.<br>
 > Just know that this thing works quite well for most needs.
 
-**Please note that SAM can only output voice for English ASCII text!!**
-
 # Compiling
 Just run `dotnet build` in the root of this repository to build the library.
 
 # Usage
+> **Please note that SAM can only output voice for English ASCII text!!**
 
 To use this library first add the necessary `using` directive like so:
 ```cs

@@ -1,6 +1,10 @@
 namespace SAMCS
 {
 
+    /// <summary>
+    /// !!!NOT NEEDED FOR THE END USER!!!
+    /// Intended for internal use only, no need to look at this or even understand this
+    /// </summary>
     public class SpeechRenderer
     {
         private readonly SpeechRendererTables mSpeechRendererTables = new SpeechRendererTables();
@@ -657,7 +661,7 @@ namespace SAMCS
             mOldtimetableindex = (uint)index;
             // write a little bit in advance
             for (int i = 0; i < 5; i++)
-                a.Write(a.Cursor/50 + i, ary[i]);
+                a.AppendAt(a.Cursor/50 + i, ary[i]);
         }
 
         private void Output8Bit(ref AudioBuffer a, int index, byte A)
