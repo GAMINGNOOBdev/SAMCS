@@ -9,12 +9,12 @@
     <RepositoryUrl>https://github.com/GAMINGNOOBdev/SAMCS</RepositoryUrl>
     <PackageTags>SoftwareAutomaticMouth, SAM, Audio, C#, CSharp</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageReadmeFile>LICENSE</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="licenses\LICENSE.txt" Pack="true" PackagePath=""/>
-    <None Include="docs\README.md" Pack="true" PackagePath=""/>
+    <None Include="LICENSE" Pack="true" PackagePath=""/>
+    <None Include="README.md" Pack="true" PackagePath=""/>
   </ItemGroup>
 
 </Project>
