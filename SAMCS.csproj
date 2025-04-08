@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>SAMCS</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>GAMINGNOOBdev</Authors>
     <Description>Cross platform Microsoft SAM library</Description>
     <RepositoryUrl>https://github.com/GAMINGNOOBdev/SAMCS</RepositoryUrl>
-    <PackageTags>audio, nuget</PackageTags>
+    <PackageTags>SoftwareAutomaticMouth, SAM, Audio, C#, CSharp</PackageTags>
   </PropertyGroup>
 
 </Project>

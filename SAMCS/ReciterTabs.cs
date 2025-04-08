@@ -4,7 +4,7 @@ namespace SAMCS
     {
 
         //some flags
-        public static readonly byte[] tab36376 =
+        public readonly byte[] tab36376 =
         {
             0, 0, 0, 0, 0, 0, 0, 0, // 0-7
             0, 0, 0, 0, 0, 0, 0, 0, // 8-15
@@ -22,7 +22,7 @@ namespace SAMCS
             163, 76, 138, 142
         };
 
-        public static readonly byte[] rules =
+        public readonly byte[] rules =
         {
             (byte)']','A'|0x80,
             (byte)' ',(byte)'(',(byte)'A',(byte)'.',(byte)')',                    (byte)'=',(byte)'E',(byte)'H',(byte)'4',(byte)'Y',(byte)'.',' '|0x80,
@@ -480,7 +480,7 @@ namespace SAMCS
             'j'|0x80
         };
 
-        public static readonly byte[] rules2 =
+        public readonly byte[] rules2 =
         {
             (byte)'(',(byte)'A',(byte)')',                            '='|0x80,
             (byte)'(',(byte)'!',(byte)')',                            (byte)'=','.'|0x80,
@@ -529,7 +529,7 @@ namespace SAMCS
 
         //26 items. From 'A' to 'Z'
         // positions for mem62 and mem63 for each character
-        public static readonly byte[] tab37489 =
+        public readonly byte[] tab37489 =
         {
             0, 149, 247, 162, 57, 197, 6, 126,
             199, 38, 55, 78, 145, 241, 85, 161,
@@ -537,7 +537,7 @@ namespace SAMCS
             71, 218
         };
 
-        public static readonly byte[] tab37515 =
+        public readonly byte[] tab37515 =
         {
             125, 126, 126, 127, 128, 129, 130, 130,
             130, 132, 132, 132, 132, 132, 133, 135,

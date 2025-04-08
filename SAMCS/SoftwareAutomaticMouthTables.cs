@@ -1,15 +1,15 @@
 namespace SAMCS
 {
-    public static class SoftwareAutomaticMouthTables
+    public class SoftwareAutomaticMouthTables
     {
         // tab40672
-        public static readonly char[] stressInputTable = 
+        public readonly char[] stressInputTable = 
         {
             '*', '1', '2', '3', '4', '5', '6', '7', '8'
         };
 
         // tab40682
-        public static readonly char[] signInputTable1 = 
+        public readonly char[] signInputTable1 = 
         {
             ' ', '.', '?', ',', '-', 'I', 'I', 'E',
             'A', 'A', 'A', 'A', 'U', 'A', 'I', 'E',
@@ -25,7 +25,7 @@ namespace SAMCS
         };
 
         // tab40763
-        public static readonly char[] signInputTable2 = 
+        public readonly char[] signInputTable2 = 
         {
             '*', '*', '*', '*', '*', 'Y', 'H', 'H',
             'E', 'A', 'H', 'O', 'H', 'X', 'X', 'R',
@@ -41,7 +41,7 @@ namespace SAMCS
         };
 
         // loc_9F8C
-        public static readonly byte[] flags = 
+        public readonly byte[] flags = 
         {
             0x00, 0x00, 0x00, 0x00, 0x00, 0xA4, 0xA4, 0xA4,
             0xA4, 0xA4, 0xA4, 0x84, 0x84, 0xA4, 0xA4, 0x84,
@@ -58,7 +58,7 @@ namespace SAMCS
 
         // ??? flags overlap flags2
         // loc_9FDA
-        public static readonly byte[] flags2 = 
+        public readonly byte[] flags2 = 
         {
             0x80, 0xC1, 0xC1, 0xC1, 0xC1, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -73,7 +73,7 @@ namespace SAMCS
         };
 
         // tab45616???
-        public static readonly byte[] phonemeStressedLengthTable = 
+        public readonly byte[] phonemeStressedLengthTable = 
         {
             0x00, 0x12, 0x12, 0x12, 8, 0xB, 9, 0xB,
             0xE, 0xF, 0xB, 0x10, 0xC, 6, 6, 0xE,
@@ -88,7 +88,7 @@ namespace SAMCS
         };
 
         // tab45536???
-        public static readonly byte[] phonemeLengthTable = 
+        public readonly byte[] phonemeLengthTable = 
         {
             0, 0x12, 0x12, 0x12, 8, 8, 8, 8,
             8, 0xB, 6, 0xC, 0xA, 5, 5, 0xB,

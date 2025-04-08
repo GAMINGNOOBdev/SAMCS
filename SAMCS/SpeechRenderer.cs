@@ -3,6 +3,8 @@ namespace SAMCS
 
     public class SpeechRenderer
     {
+        private readonly SpeechRendererTables mSpeechRendererTables = new SpeechRendererTables();
+
         //timetable for more accurate c64 simulation
         private static readonly int[][] gTimetable =
         {
@@ -13,7 +15,6 @@ namespace SAMCS
             new int[]{199, 0, 0, 54, 54}
         };
 
-
         private readonly byte[] mSampledConsonantFlag = new byte[256]; // tab44800
         private readonly byte[] mFrequency1 = new byte[256];
         private readonly byte[] mFrequency2 = new byte[256];
@@ -23,14 +24,28 @@ namespace SAMCS
         private readonly byte[] mAmplitude3 = new byte[256];
         private readonly byte[] mPitches = new byte[256];
         private uint mOldtimetableindex = 0;
+        private byte mThroat, mMouth;
+
+        public byte Throat
+        {
+            get => mThroat;
+            set => SetMouthThroat(mMouth, value);
+        }
+        public byte Mouth
+        {
+            get => mMouth;
+            set => SetMouthThroat(value, mThroat);
+        }
 
         /*
             SAM's voice can be altered by changing the frequencies of the
             mouth formant (F1) and the throat formant (F2). Only the voiced
             phonemes (5-29 and 48-53) are altered.
         */
-        public static void SetMouthThroat(byte mouth, byte throat)
+        public void SetMouthThroat(byte mouth, byte throat)
         {
+            mMouth = mouth;
+            mThroat = throat;
             byte initialFrequency;
             byte newFrequency = 0;
 
@@ -63,12 +78,12 @@ namespace SAMCS
                 // recalculate mouth mFrequency
                 initialFrequency = mouthFormants5_29[pos];
                 if (initialFrequency != 0) newFrequency = Trans(mouth, initialFrequency);
-                SpeechRendererTables.freq1data[pos] = newFrequency;
+                mSpeechRendererTables.freq1data[pos] = newFrequency;
 
                 // recalculate throat mFrequency
                 initialFrequency = throatFormants5_29[pos];
                 if(initialFrequency != 0) newFrequency = Trans(throat, initialFrequency);
-                SpeechRendererTables.freq2data[pos] = newFrequency;
+                mSpeechRendererTables.freq2data[pos] = newFrequency;
                 pos++;
             }
 
@@ -81,12 +96,12 @@ namespace SAMCS
                 // recalculate F1 (mouth formant)
                 initialFrequency = mouthFormants48_53[tmpIndex];
                 newFrequency = Trans(mouth, initialFrequency);
-                SpeechRendererTables.freq1data[pos] = newFrequency;
+                mSpeechRendererTables.freq1data[pos] = newFrequency;
 
                 // recalculate F2 (throat formant)
                 initialFrequency = throatFormants48_53[tmpIndex];
                 newFrequency = Trans(throat, initialFrequency);
-                SpeechRendererTables.freq2data[pos] = newFrequency;
+                mSpeechRendererTables.freq2data[pos] = newFrequency;
                 tmpIndex++;
                 pos++;
             }
@@ -150,7 +165,7 @@ namespace SAMCS
                 //  pos47615:
 
                 // get the stress amount (more stress = higher pitch)
-                phase1 = SpeechRendererTables.tab47492[b.StressOutput[inIndex] + 1];
+                phase1 = mSpeechRendererTables.tab47492[b.StressOutput[inIndex] + 1];
 
                 // get number of frames to write
                 phase2 = b.PhonemeLengthOutput[inIndex];
@@ -159,13 +174,13 @@ namespace SAMCS
                 // copy from the source to the frames list
                 do
                 {
-                    mFrequency1[indexSample] = SpeechRendererTables.freq1data[inIndex];     // F1 mFrequency
-                    mFrequency2[indexSample] = SpeechRendererTables.freq2data[inIndex];     // F2 mFrequency
-                    mFrequency3[indexSample] = SpeechRendererTables.freq3data[inIndex];     // F3 mFrequency
-                    mAmplitude1[indexSample] = SpeechRendererTables.ampl1data[inIndex];     // F1 mAmplitude
-                    mAmplitude2[indexSample] = SpeechRendererTables.ampl2data[inIndex];     // F2 mAmplitude
-                    mAmplitude3[indexSample] = SpeechRendererTables.ampl3data[inIndex];     // F3 mAmplitude
-                    mSampledConsonantFlag[indexSample] = SpeechRendererTables.sampledConsonantFlags[inIndex];        // phoneme data for sampled consonants
+                    mFrequency1[indexSample] = mSpeechRendererTables.freq1data[inIndex];     // F1 mFrequency
+                    mFrequency2[indexSample] = mSpeechRendererTables.freq2data[inIndex];     // F2 mFrequency
+                    mFrequency3[indexSample] = mSpeechRendererTables.freq3data[inIndex];     // F3 mFrequency
+                    mAmplitude1[indexSample] = mSpeechRendererTables.ampl1data[inIndex];     // F1 mAmplitude
+                    mAmplitude2[indexSample] = mSpeechRendererTables.ampl2data[inIndex];     // F2 mAmplitude
+                    mAmplitude3[indexSample] = mSpeechRendererTables.ampl3data[inIndex];     // F3 mAmplitude
+                    mSampledConsonantFlag[indexSample] = mSpeechRendererTables.sampledConsonantFlags[inIndex];        // phoneme data for sampled consonants
                     mPitches[indexSample] = (byte)(b.Pitch + phase1);      // pitch
                     indexSample++;
                     phase2--;
@@ -326,29 +341,29 @@ namespace SAMCS
 
                 // get the ranking of each phoneme
                 indexSample = outIndexRankingValuePitchSample;
-                mem56 = SpeechRendererTables.blendRank[outIndexRankingValuePitchSample];
-                outIndexRankingValuePitchSample = SpeechRendererTables.blendRank[inIndex];
+                mem56 = mSpeechRendererTables.blendRank[outIndexRankingValuePitchSample];
+                outIndexRankingValuePitchSample = mSpeechRendererTables.blendRank[inIndex];
 
                 // compare the rank - lower rank value is stronger
                 if (outIndexRankingValuePitchSample == mem56)
                 {
                     // same rank, so use out blend lengths from each phoneme
-                    phase1 = SpeechRendererTables.outBlendLength[inIndex];
-                    phase2 = SpeechRendererTables.outBlendLength[indexSample];
+                    phase1 = mSpeechRendererTables.outBlendLength[inIndex];
+                    phase2 = mSpeechRendererTables.outBlendLength[indexSample];
                 }
                 else
                 if (outIndexRankingValuePitchSample < mem56)
                 {
                     // first phoneme is stronger, so us it's blend lengths
-                    phase1 = SpeechRendererTables.inBlendLength[indexSample];
-                    phase2 = SpeechRendererTables.outBlendLength[indexSample];
+                    phase1 = mSpeechRendererTables.inBlendLength[indexSample];
+                    phase2 = mSpeechRendererTables.outBlendLength[indexSample];
                 }
                 else
                 {
                     // second phoneme is stronger, so use it's blend lengths
                     // note the out/in are swapped
-                    phase1 = SpeechRendererTables.outBlendLength[inIndex];
-                    phase2 = SpeechRendererTables.inBlendLength[inIndex];
+                    phase1 = mSpeechRendererTables.outBlendLength[inIndex];
+                    phase2 = mSpeechRendererTables.inBlendLength[inIndex];
                 }
 
                 inIndex = mem44;
@@ -483,7 +498,7 @@ namespace SAMCS
 
 
             // don't adjust pitch if in sing mode
-            if (!b.Singing)
+            if (!b.Sing)
             {
                 // iterate through the buffer
                 for(i=0; i<256; i++)
@@ -508,9 +523,9 @@ namespace SAMCS
             //mAmplitude rescaling
             for(i=255; i>=0; i--)
             {
-                mAmplitude1[i] = SpeechRendererTables.amplitudeRescale[mAmplitude1[i]];
-                mAmplitude2[i] = SpeechRendererTables.amplitudeRescale[mAmplitude2[i]];
-                mAmplitude3[i] = SpeechRendererTables.amplitudeRescale[mAmplitude3[i]];
+                mAmplitude1[i] = mSpeechRendererTables.amplitudeRescale[mAmplitude1[i]];
+                mAmplitude2[i] = mSpeechRendererTables.amplitudeRescale[mAmplitude2[i]];
+                mAmplitude3[i] = mSpeechRendererTables.amplitudeRescale[mAmplitude3[i]];
             }
 
             inIndex = 0;
@@ -555,9 +570,9 @@ namespace SAMCS
                     uint p3 = (uint)phase3 * 256;
                     int k;
                     for (k=0; k<5; k++) {
-                        sbyte sp1 = (sbyte)SpeechRendererTables.sinus[0xff & (p1>>8)];
-                        sbyte sp2 = (sbyte)SpeechRendererTables.sinus[0xff & (p2>>8)];
-                        sbyte rp3 = (sbyte)SpeechRendererTables.rectangle[0xff & (p3>>8)];
+                        sbyte sp1 = (sbyte)mSpeechRendererTables.sinus[0xff & (p1>>8)];
+                        sbyte sp2 = (sbyte)mSpeechRendererTables.sinus[0xff & (p2>>8)];
+                        sbyte rp3 = (sbyte)mSpeechRendererTables.rectangle[0xff & (p3>>8)];
                         int sin1 = sp1 * ((byte)mAmplitude1[inIndex] & 0x0f);
                         int sin2 = sp2 * ((byte)mAmplitude2[inIndex] & 0x0f);
                         int rect = rp3 * ((byte)mAmplitude3[inIndex] & 0x0f);
@@ -784,7 +799,7 @@ namespace SAMCS
             // /X                     4          0x17
 
             // get value from the table
-            mem53 = SpeechRendererTables.tab48426[cpux];
+            mem53 = mSpeechRendererTables.tab48426[cpux];
             byte mem47 = cpux;      //46016+mem[56]*256
 
             // voiced sample?
@@ -807,7 +822,7 @@ namespace SAMCS
 
             // get the next sample from the table
             // mem47*256 = offset to start of samples
-            cpua = SpeechRendererTables.sampleTable[mem47*256+cpuy];
+            cpua = mSpeechRendererTables.sampleTable[mem47*256+cpuy];
         pos48280:
 
             // left shift to get the high bit
@@ -867,7 +882,7 @@ namespace SAMCS
                 //A = Read(mem47, Y);
 
                 // fetch value from table
-                cpua = SpeechRendererTables.sampleTable[mem47*256+cpuy];
+                cpua = mSpeechRendererTables.sampleTable[mem47*256+cpuy];
 
                 // loop 8 times
                 //pos48327:

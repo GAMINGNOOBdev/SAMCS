@@ -3,48 +3,50 @@ namespace SAMCS
 
     public class Reciter
     {
-        private static readonly byte[] inputtemp = new byte[256];   // secure copy of input tab36096
+        private readonly ReciterTabs mReciterTabs = new ReciterTabs();
 
-        private static byte mem56, mem57, mem58, mem59, mem60, mem61, mem64, mem65, mem66, mem36653;
-        private static ushort mem62;
-        private static byte A, X, Y;
+        private readonly byte[] inputtemp = new byte[256];   // secure copy of input tab36096
 
-        private static  void Code37055(byte mem59)
+        private byte mem56, mem57, mem58, mem59, mem60, mem61, mem64, mem65, mem66, mem36653;
+        private ushort mem62;
+        private byte A, X, Y;
+
+        private void Code37055(byte mem59)
         {
             X = mem59;
             X--;
             A = inputtemp[X];
             Y = A;
-            A = ReciterTabs.tab36376[Y];
+            A = mReciterTabs.tab36376[Y];
             return;
         }
 
-        private static  void Code37066(byte mem58)
+        private void Code37066(byte mem58)
         {
             X = mem58;
             X++;
             A = inputtemp[X];
             Y = A;
-            A = ReciterTabs.tab36376[Y];
+            A = mReciterTabs.tab36376[Y];
         }
 
-        private static  byte GetRuleByte(ushort mem62, byte Y)
+        private byte GetRuleByte(ushort mem62, byte Y)
         {
             uint address = mem62;
 
             if (mem62 >= 37541)
             {
                 address -= 37541;
-                return ReciterTabs.rules2[address + Y];
+                return mReciterTabs.rules2[address + Y];
             }
 
             address -= 32000;
-            if (address >= ReciterTabs.rules.Length)
+            if (address >= mReciterTabs.rules.Length)
                 address = 0;
-            return ReciterTabs.rules[address + Y];
+            return mReciterTabs.rules[address + Y];
         }
 
-        public static int TextToPhonemes(byte[] input) // Code36484
+        public int TextToPhonemes(byte[] input) // Code36484
         {
             inputtemp[0] = 32;
 
@@ -68,7 +70,6 @@ namespace SAMCS
             inputtemp[X] = 27;
             mem61 = 255;
 
-        pos36550:
             A = 255;
             mem56 = 255;
 
@@ -95,7 +96,7 @@ namespace SAMCS
                 if (A != '.') break;
                 X++;
                 Y = inputtemp[X];
-                A = (byte)(ReciterTabs.tab36376[Y] & 1);
+                A = (byte)(mReciterTabs.tab36376[Y] & 1);
                 if (A != 0) break;
                 mem56++;
                 X = mem56;
@@ -107,7 +108,7 @@ namespace SAMCS
             //pos36607:
             A = mem64;
             Y = A;
-            A = ReciterTabs.tab36376[A];
+            A = mReciterTabs.tab36376[A];
             mem57 = A;
             if ((A & 2) != 0)
             {
@@ -147,7 +148,7 @@ namespace SAMCS
 
             // go to the right rules for this character.
             X = (byte)(mem64 - (byte)'A');
-            mem62 = (byte)(ReciterTabs.tab37489[X] | ReciterTabs.tab37515[X] << 8);
+            mem62 = (byte)(mReciterTabs.tab37489[X] | mReciterTabs.tab37515[X] << 8);
 
         // -------------------------------------
         // go to neXt rule
@@ -227,7 +228,7 @@ namespace SAMCS
                 //36800: BPL 36805
                 if ((byte)(A & 128) != 0) goto pos37180;
                 X = (byte)(A & 127);
-                A = (byte)(ReciterTabs.tab36376[X] & 128);
+                A = (byte)(mReciterTabs.tab36376[X] & 128);
                 if (A == 0) break;
                 X = (byte)(mem59 - 1);
                 A = inputtemp[X];
@@ -342,7 +343,7 @@ namespace SAMCS
             X++;
             Y = inputtemp[X];
             X--;
-            A = (byte)(ReciterTabs.tab36376[Y] & 128);
+            A = (byte)(mReciterTabs.tab36376[Y] & 128);
             if (A == 0) goto pos37108;
             X++;
             A = inputtemp[X];
@@ -397,7 +398,7 @@ namespace SAMCS
             A = GetRuleByte(mem62, Y);
             mem57 = A;
             X = A;
-            A = (byte)(ReciterTabs.tab36376[X] & 128);
+            A = (byte)(mReciterTabs.tab36376[X] & 128);
             if (A == 0) goto pos37226;
             X = (byte)(mem58 + 1);
             A = inputtemp[X];

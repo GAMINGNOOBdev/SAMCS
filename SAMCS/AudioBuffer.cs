@@ -10,6 +10,10 @@ namespace SAMCS
         private int mCursor;
         private int mSize;
 
+        public int Samplerate => 22050;
+        public int BitsPerSample => 8;
+        public int Channels => 1;
+
         public byte[] Buffer
         {
             get => mBuffer;
